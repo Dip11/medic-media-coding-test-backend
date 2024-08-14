@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './database/database.config';
 import { getEnvPath } from './common/helper/env.helper';
+import { ApiModule } from './api/api.module';
 
 const envFilePath: string = getEnvPath(`./`);
 
@@ -12,6 +13,7 @@ const envFilePath: string = getEnvPath(`./`);
   imports: [
     ConfigModule.forRoot({ envFilePath, isGlobal: true }),
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
