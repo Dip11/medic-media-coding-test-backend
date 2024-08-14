@@ -7,8 +7,8 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   public email!: string;
 
-  @Exclude()
   @Column({ type: 'varchar' })
+  @Exclude()
   public password!: string;
 
   @Column({ type: 'varchar', nullable: true })
