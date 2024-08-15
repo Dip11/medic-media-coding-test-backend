@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from './user.entity';
 
 @Entity()
 export class Task extends BaseEntity {
@@ -15,4 +16,8 @@ export class Task extends BaseEntity {
   @ApiProperty()
   @Column({ type: 'date', default: () => 'CURRENT_TIMESTAMP' })
   dueDate: string;
+
+  @ManyToOne(() => User, (user) => user.tasks)
+  @JoinColumn({ name: 'created_by' })
+  createdBy: User;
 }

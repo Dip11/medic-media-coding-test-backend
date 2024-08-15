@@ -1,7 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Task } from './task.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -25,4 +26,7 @@ export class User extends BaseEntity {
   @ApiProperty()
   @Column({ type: 'timestamp', nullable: true, default: null })
   public lastLoginAt: Date | null;
+
+  @OneToMany(() => Task, (task) => task.createdBy)
+  tasks?: Task[];
 }
