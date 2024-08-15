@@ -1,18 +1,85 @@
 import { Task } from '@/database/entities/task.entity';
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AddTaskInputDTO, UpdateTaskInputDTO } from './task.dto';
+import { DataSource, Repository } from 'typeorm';
+import {
+  AddTaskInputDTO,
+  GetTasksQueryDTO,
+  GetTasksResponseDTO,
+  UpdateTaskInputDTO,
+} from './task.dto';
 import { User } from '@/database/entities/user.entity';
 @Injectable()
 export class TaskService {
   /**
-   * タスクリポジトリを注入するプロパティ。
+   * `TaskService` のコンストラクタ。
    *
-   * TypeORM の `Repository<Task>` を使用して、データベースに対するタスクエンティティの操作を行います。
+   * タスクリポジトリとデータベース接続のための `DataSource` を注入します。
+   *
+   * @param repository - タスクエンティティに対するデータベース操作を行うリポジトリ。
+   * @param dataSource - データベースへの接続を管理するデータソース。
    */
-  @InjectRepository(Task)
-  private readonly repository: Repository<Task>;
+  constructor(
+    @InjectRepository(Task) private readonly repository: Repository<Task>,
+    private readonly dataSource: DataSource,
+  ) {}
+
+  /**
+   * すべてのタスクを取得するメソッド。
+   *
+   * 指定されたクエリパラメータ (`GetTasksQueryDTO`) と認証済みユーザーを基に、
+   * ユーザーに関連するすべてのタスクをデータベースから取得します。
+   * このメソッドはトランザクションを使用して、データの一貫性を確保します。
+   *
+   * @param query - タスクをフィルタリングおよびソートするためのクエリパラメータ。
+   * @param user - 現在の認証済みユーザー。
+   * @returns 取得されたタスクの情報 (`GetTasksResponseDTO`)。
+   * @throws HttpException - データベース操作に失敗した場合にスローされます。
+   */
+  public async getAll(
+    query: GetTasksQueryDTO,
+    user: User,
+  ): Promise<GetTasksResponseDTO> {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const { sortBy, sortDir } = query;
+
+      // タスクをクエリビルダーを使用して取得し、ユーザーIDでフィルタリングします。
+      const taskQuery = queryRunner.manager
+        .getRepository(Task)
+        .createQueryBuilder('task')
+        .where('task.createdBy = :id', {
+          id: user.id,
+        });
+
+      // ソート条件が指定されている場合は、それに従ってソートします。
+      if (sortBy && sortDir) {
+        taskQuery.orderBy(`task.${sortBy}`, sortDir);
+      }
+
+      // クエリを実行し、すべてのタスクを取得します。
+      const allTasks: Task[] = await taskQuery.getMany();
+
+      // 取得されたタスクデータをレスポンスオブジェクトに設定します。
+      const responseData: GetTasksResponseDTO = {
+        data: allTasks,
+      };
+
+      // トランザクションをコミットして変更を確定します。
+      await queryRunner.commitTransaction();
+      return responseData;
+    } catch (error) {
+      // エラーが発生した場合、トランザクションをロールバックします。
+      console.log(error);
+      await queryRunner.rollbackTransaction();
+      throw new HttpException(error.message, 500);
+    } finally {
+      // 手動で作成したクエリランナーを解放して接続を閉じます。
+      await queryRunner.release();
+    }
+  }
 
   /**
    * 新しいタスクを追加するメソッド。
