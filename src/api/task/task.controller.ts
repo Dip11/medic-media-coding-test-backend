@@ -1,7 +1,16 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { AddTaskInputDTO } from './task.dto';
+import { AddTaskInputDTO, UpdateTaskInputDTO } from './task.dto';
 import { Task } from '@/database/entities/task.entity';
 import { JwtAuthGuard } from '../user/auth/auth.guard';
 import { Request } from 'express';
@@ -41,5 +50,46 @@ export class TaskController {
   ): Promise<Task> {
     // タスクを追加し、作成されたタスクを返します。
     return this.taskService.add(addTaskInputDTO, <User>user);
+  }
+
+  /**
+   * 既存のタスクを編集するエンドポイント。
+   *
+   * クライアントから送信されたタスクIDと新しいタスク情報 (`UpdateTaskInputDTO`) を受け取り、
+   * 指定されたタスクを更新します。更新されたタスクは、レスポンスとして返されます。
+   *
+   * @param id - 更新するタスクのID。
+   * @param updateTaskInputDTO - 更新するタスクの新しい情報を含む DTO。
+   * @returns 更新されたタスクの情報 (`Task`)。
+   */
+  @Put(':id')
+  @ApiOkResponse({
+    description: '既存のタスクを編集した後の応答データ',
+    type: Task,
+  })
+  public async update(
+    @Param('id') id: string,
+    @Body() updateTaskInputDTO: UpdateTaskInputDTO,
+  ): Promise<Task> {
+    return this.taskService.update(id, updateTaskInputDTO);
+  }
+
+  /**
+   * 既存のタスクを削除するエンドポイント。
+   *
+   * クライアントから送信されたタスクIDを受け取り、指定されたタスクを削除します。
+   * 削除されたタスクの情報は、レスポンスとして返されます。
+   *
+   * @param id - 削除するタスクのID。
+   * @returns 削除されたタスクの情報 (`Task`)。
+   */
+  @Delete(':id')
+  @ApiOkResponse({
+    description: 'タスク削除後の応答データ',
+    type: Task,
+  })
+  public async delete(@Param('id') id: string): Promise<Task> {
+    // タスクを削除し、削除されたタスクの情報を返します。
+    return this.taskService.delete(id);
   }
 }

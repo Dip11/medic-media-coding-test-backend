@@ -14,3 +14,17 @@ export class AddTaskInputDTO {
   @IsString()
   dueDate: string;
 }
+
+export class UpdateTaskInputDTO {
+  @ApiProperty()
+  @IsString()
+  title: string;
+
+  @ApiProperty()
+  @IsString()
+  detail: string;
+
+  @ApiProperty()
+  @IsString()
+  dueDate: string;
+}
