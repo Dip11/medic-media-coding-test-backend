@@ -2,15 +2,22 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { AddTaskInputDTO, UpdateTaskInputDTO } from './task.dto';
+import {
+  AddTaskInputDTO,
+  GetTasksQueryDTO,
+  GetTasksResponseDTO,
+  UpdateTaskInputDTO,
+} from './task.dto';
 import { Task } from '@/database/entities/task.entity';
 import { JwtAuthGuard } from '../user/auth/auth.guard';
 import { Request } from 'express';
@@ -27,6 +34,30 @@ export class TaskController {
    * @param taskService - タスク操作を担当するサービス。
    */
   constructor(private taskService: TaskService) {}
+
+  /**
+   * すべてのタスクを取得するエンドポイント。
+   *
+   * クライアントから送信されたクエリパラメータ (`GetTasksQueryDTO`) と認証済みユーザー情報を基に、
+   * 現在のユーザーに関連するすべてのタスクを取得します。取得されたタスクは、
+   * `GetTasksResponseDTO` オブジェクトとしてレスポンスとして返されます。
+   *
+   * @param query - タスクをフィルタリングするためのクエリパラメータ。
+   * @param user - リクエストから取得された認証済みのユーザー情報。
+   * @returns 取得されたすべてのタスクの情報 (`GetTasksResponseDTO`)。
+   */
+  @Get('/')
+  @ApiOkResponse({
+    description: 'すべてのタスクの応答データ',
+    type: GetTasksResponseDTO,
+  })
+  public async getAll(
+    @Query() query: GetTasksQueryDTO,
+    @Req() { user }: Request,
+  ): Promise<GetTasksResponseDTO> {
+    // すべてのタスクを取得し、取得されたタスクの情報を返します。
+    return this.taskService.getAll(query, <User>user);
+  }
 
   /**
    * 新しいタスクを追加するエンドポイント。
