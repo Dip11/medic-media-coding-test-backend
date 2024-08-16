@@ -18,7 +18,10 @@ export class AuthService {
     const { email, password }: LoginDto = body;
     const user: User = await this.repository.findOne({ where: { email } });
     if (!user) {
-      throw new HttpException('No user found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'ユーザーが見つかりません。',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     const isPasswordValid: boolean = this.helper.isPasswordValid(
@@ -27,7 +30,10 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new HttpException('Password is invalid.', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'パスワードが正しくありません。',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     this.repository.update(user.id, { lastLoginAt: new Date() });
