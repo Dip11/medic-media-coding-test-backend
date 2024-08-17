@@ -1,73 +1,122 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# タスク管理アプリケーション - バックエンド
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## 概要
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+このリポジトリは、タスク管理アプリケーションのバックエンド部分を管理します。NestJSを使用して構築されており、セキュアなユーザー認証、タスク管理、およびデータベース操作を提供します。JWTによる認証により、ユーザーのデータを安全に管理し、各ユーザーのタスクを個別に保持します。また、新規ユーザーの登録機能も備えており、ユーザーが簡単にアカウントを作成できます。
 
-## Description
+## 機能
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **ユーザー登録:** 新しいユーザーがアカウントを作成できます。
+- **ユーザー認証:** JWTを使用したセキュアな登録、ログイン、ログアウト機能。
+- **タスク管理:** タスクの作成、表示、更新、削除機能。
+- **APIドキュメンテーション:** Swaggerを使用して自動生成されたAPIドキュメントを提供。
 
-## Installation
+## 技術スタック
 
-```bash
-$ npm install
+- **バックエンド:** NestJS, TypeORM, Swagger, Passport-JWT。
+- **データベース:** PostgreSQL。
+- **デプロイ:** Google Cloud Run, Docker, GitHub Actions。
+
+## セットアップ手順
+
+### 前提条件
+
+- Node.js および npm がインストールされていること。
+- PostgreSQLデータベースがセットアップされていること。
+- デプロイのためのGoogle Cloud SDK。
+
+### リポジトリをクローン
+
+```
+git clone https://github.com/Dip11/medic-media-coding-test-backend.git
+cd medic-media-coding-test-backend
 ```
 
-## Running the app
+### 依存関係をインストール
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+npm install
 ```
 
-## Test
 
-```bash
-# unit tests
-$ npm run test
+### 環境変数
 
-# e2e tests
-$ npm run test:e2e
+ルートディレクトリに .env ファイルを作成し、次の内容を追加してください:
 
-# test coverage
-$ npm run test:cov
+```
+ENVIRONMENT=development
+_PORT=8080
+DATABASE_HOST=
+DATABASE_NAME=
+DATABASE_USER=
+DATABASE_PASSWORD=
+DATABASE_PORT=
+JWT_KEY=dev
+JWT_EXPIRES=365d
 ```
 
-## Support
+### データベースのマイグレーション
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+アプリケーションを起動する前に、以下のコマンドを実行してデータベースをマイグレートしてください:
 
-## Stay in touch
+```
+npm run migration:run
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### アプリケーションの起動
+```
+npm run dev
+```
 
-## License
+アプリケーションは http://localhost:8080 で利用可能です。
 
-Nest is [MIT licensed](LICENSE).
+## デプロイ手順
+
+### アプリケーションのDocker化
+プロジェクトにはすでに Dockerfile が含まれているため、新しいものを作成する必要はありません。
+
+### Dockerイメージのビルドとプッシュ
+```
+docker build -t gcr.io/your-project-id/task-backend .
+```
+
+### Google Cloud Runへのデプロイ
+```
+gcloud run deploy task-backend \
+  --image gcr.io/your-project-id/task-backend \
+  --platform managed \
+  --region asia-northeast1 \
+  --allow-unauthenticated
+```
+
+## CI/CDセットアップ
+
+CI/CDパイプラインはGitHub Actionsを使用して設定されています。ワークフローファイルは .github/workflows/google-cloudrun-docker.yml に配置されています。
+
+### Google Cloud 認証のためのリポジトリシークレット
+サービスアカウントの作成と権限設定
+1. GCPのIAMでサービスアカウントを作成します。
+2. 以下の権限を付与します:
+* Cloud Run:
+  - roles/run.admin
+  - roles/iam.serviceAccountUser
+* Artifact Registry:
+  - roles/artifactregistry.admin
+
+3. このサービスアカウントのキーを作成し、JSON形式でダウンロードします。
+4. このキーをGitHubリポジトリのシークレットとしてGCP_CREDENTIALSという名前で追加します。
+
+### ファイル内の次のセクションを更新してください:
+```
+env:
+  PROJECT_ID: your-google-cloud-project-id # Google CloudプロジェクトIDを更新
+  GAR_NAME: your-artifact-registry-name # Artifact Registry名を更新
+  GAR_LOCATION: asia-northeast1 # Artifact Registryの場所を確認または更新
+  SERVICE: your-cloud-run-service-name # Cloud Runサービス名を更新
+  REGION: asia-northeast1 # Cloud Runサービスのリージョンを確認または更新
+```
+
+## 監視
+デプロイプロセスはGitHub ActionsまたはGCPコンソールで監視できます。デプロイが完了すると、アプリケーションはGoogle Cloud Run上で稼働します。
+
+
